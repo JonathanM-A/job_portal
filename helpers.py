@@ -10,4 +10,4 @@ def check_required_fields(required_fields):
 
 
 def allowed_file(filename):
-    return "." in filename and filename.rsplit(".", 1)[1].lower() in ["pdf"]
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ["pdf", "doc", "docx"]
