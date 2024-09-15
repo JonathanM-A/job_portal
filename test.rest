@@ -1,0 +1,52 @@
+POST http://127.0.0.1:5000/register HTTP/1.1
+content-type: application/json
+
+{   
+    "first name": "Kwame",
+    "last name": "Mensah",
+    "email": "jonathan@ymail.com",
+    "is_employer": true,
+    "password": "Jonathan1@"
+}
+
+###
+
+POST http://127.0.0.1:5000/jobs HTTP/1.1
+content-type: application/json
+
+{
+    "title": "Frontend engineer",
+    "description": "5 years experience"
+}
+
+###
+
+POST http://127.0.0.1:5000/login HTTP/1.1
+content-type: application/json
+
+{   
+    "email": "jonathan@ymail.com",
+    "password": "Jonathan1@"
+}
+
+###
+
+GET http://127.0.0.1:5000/jobs HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcyNjQyMTMyMiwianRpIjoiN2QzNTIxY2YtNDFjZS00NDYzLWJhMjAtYjQyNWYxYTE4NzJmIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6MSwibmJmIjoxNzI2NDIxMzIyLCJjc3JmIjoiZTMwYjQxN2QtZjZhNS00ZmY5LWFlYzItNTAwMzI3NTQ2ZjA2IiwiZXhwIjoxNzI2NDIyMjIyLCJpc19lbXBsb3llciI6ZmFsc2V9.QzWJTCf3KKLXtXpsGDXa6QggraOeLT0gvI2x8NQCaSM
+
+###
+
+GET http://127.0.0.1:5000/jobs/1 HTTP/1.1
+
+###
+
+POST http://127.0.0.1:5000/jobs/5/apply HTTP/1.1
+Content-Type: multipart/form-data
+
+{
+
+}
+
+###
+GET http://127.0.0.1:5000/applications HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcyNjQyNzg4NCwianRpIjoiNWFjMTY4NDEtNWYzNi00ZDAyLWI1NjUtZDA0M2FkYmEwYzgyIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6NCwibmJmIjoxNzI2NDI3ODg0LCJjc3JmIjoiNjI0YmQxY2QtODg5Zi00MzMyLWE0ZGYtZmZiM2QxYjhiNjZiIiwiZXhwIjoxNzI2NDI4Nzg0fQ.idX3JdPjBmZ3jTOb8NwKmIN58htywY-_T21HajeCxvs
