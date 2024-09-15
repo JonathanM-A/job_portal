@@ -1,8 +1,10 @@
 from flask import jsonify, request, session
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from models import User, Job, Application
 from werkzeug.security import generate_password_hash, check_password_hash
-import psycopg2, re, os
 from helpers import check_required_fields, allowed_file
+from datetime import timedelta
+import psycopg2, re, os
 
 
 def register_routes(app, db):
@@ -10,11 +12,11 @@ def register_routes(app, db):
     @app.route("/register", methods=["POST"])
     def register():
         # Check if all fields have been provided
-        required_fields = ["first name", "last name", "email", "password"]
+        required_fields = ["first name", "last name", "email", "password", "is_employer"]
         is_valid, missing_fields = check_required_fields(required_fields)
 
         if not is_valid:
-            return jsonify({"error": "Missing fields", "fields": missing_fields}), 400
+            return jsonify({"error": "Missing fields", "Missing fields": missing_fields}), 400
 
         data = request.get_json()
         first_name = data.get("first name")
@@ -75,13 +77,16 @@ def register_routes(app, db):
             
             if user and check_password_hash(user.password, password):
                 # track which users are logged in
-                session["user_id"] = user.id
-                return jsonify({"message": "Login successful"})
+                expires = timedelta(hours=24)
+                access_token = create_access_token(
+                    identity=user.id)
+                return jsonify({"message": "Login successful","access token":access_token})
 
         return jsonify({"error": "Invalid email or password"}), 401
 
     # Create or view job listings
     @app.route("/jobs", methods=["GET", "POST"])
+    @jwt_required()
     def jobs():
         if request.method == "GET":
             # Get all job listings
@@ -92,15 +97,17 @@ def register_routes(app, db):
 
             jobs_list = []
             for job in jobs:
-                jobs_list.append({"ID": job.id, "Title": job.title})
+                jobs_list.append(str(job))
             return jsonify({"Job Listings": jobs_list}), 200
 
         if request.method == "POST":
             # Create a job listing (employers only)
-            if "user_id" not in session:
-                return jsonify({"error": "You must be logged in to post a job"}), 403
+            # if "user_id" not in session:
+            #     return jsonify({"error": "You must be logged in to post a job"}), 403
+            # user_id = session["user_id"]
 
-            user_id = session["user_id"]
+            user_id = get_jwt_identity
+            print(user_id)
 
             user = User.query.filter_by(id=user_id).first()
             if not user:
@@ -140,12 +147,14 @@ def register_routes(app, db):
 
     # Apply for a job
     @app.route("/jobs/<int:id>/apply", methods=["POST"])
+    @jwt_required()
     def apply(id):
 
-        if "user_id" not in session:
-            return jsonify({"error": "You must be logged in to post a job"}), 403
+        # if "user_id" not in session:
+        #     return jsonify({"error": "You must be logged in to post a job"}), 403
 
-        user_id = session["user_id"]
+        # user_id = session["user_id"]
+        user_id = get_jwt_identity()
         applicant = User.query.get(user_id)
 
         if applicant.is_employer:
@@ -180,11 +189,11 @@ def register_routes(app, db):
 
     # Job seeker applications
     @app.route("/applications")
+    @jwt_required()
     def applications():
-        if "user_id" not in session:
-            return jsonify({"error": "You must be logged in."}), 403
-
-        user_id = session["user_id"]
+        # if "user_id" not in session:
+        #     return jsonify({"error": "You must be logged in."}), 403
+        user_id = get_jwt_identity()
         user = User.query.get(user_id)
 
         if not user:
@@ -198,3 +207,4 @@ def register_routes(app, db):
             applications.append(str(application))
         
         return jsonify({"Applications": applications})
+    
