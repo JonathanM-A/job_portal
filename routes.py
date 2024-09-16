@@ -1,8 +1,8 @@
 from flask import jsonify, request, session
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt
 from models import User, Job, Application
 from werkzeug.security import generate_password_hash, check_password_hash
-from helpers import check_required_fields, allowed_file
+from helpers import check_required_fields, allowed_file, check_if_token_is_revoked, jwt_redis_blocklist
 from datetime import timedelta
 import psycopg2, re, os
 
@@ -208,3 +208,9 @@ def register_routes(app, db):
         
         return jsonify({"Applications": applications})
     
+    @app.route("/logout")
+    @jwt_required()
+    def logout():
+        jti = get_jwt().get("jti")
+        jwt_redis_blocklist.set(jti, "", ex=timedelta(hours=24))
+        return jsonify(message="User logged out, Access token revoked"), 200

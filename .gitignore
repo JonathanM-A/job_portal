@@ -3,3 +3,4 @@ test.rest
 migrations
 uploads
 __pycache__
+dump.rdb
