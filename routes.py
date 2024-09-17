@@ -2,7 +2,7 @@ from flask import jsonify, request, session
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt
 from models import User, Job, Application
 from werkzeug.security import generate_password_hash, check_password_hash
-from helpers import check_required_fields, allowed_file, check_if_token_is_revoked, jwt_redis_blocklist
+from helpers import check_required_fields, allowed_file, jwt_redis_blocklist
 from datetime import timedelta
 import psycopg2, re, os
 
@@ -101,11 +101,7 @@ def register_routes(app, db):
             return jsonify({"Job Listings": jobs_list}), 200
 
         if request.method == "POST":
-            # Create a job listing (employers only)
-            # if "user_id" not in session:
-            #     return jsonify({"error": "You must be logged in to post a job"}), 403
-            # user_id = session["user_id"]
-
+        
             user_id = get_jwt_identity
             print(user_id)
 
@@ -150,10 +146,6 @@ def register_routes(app, db):
     @jwt_required()
     def apply(id):
 
-        # if "user_id" not in session:
-        #     return jsonify({"error": "You must be logged in to post a job"}), 403
-
-        # user_id = session["user_id"]
         user_id = get_jwt_identity()
         applicant = User.query.get(user_id)
 
@@ -191,8 +183,7 @@ def register_routes(app, db):
     @app.route("/applications")
     @jwt_required()
     def applications():
-        # if "user_id" not in session:
-        #     return jsonify({"error": "You must be logged in."}), 403
+        
         user_id = get_jwt_identity()
         user = User.query.get(user_id)
 
