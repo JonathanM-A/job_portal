@@ -1,4 +1,4 @@
-from flask import jsonify, request, session
+from flask import jsonify, request
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt
 from models import User, Job, Application
 from werkzeug.security import generate_password_hash, check_password_hash
