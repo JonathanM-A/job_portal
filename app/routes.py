@@ -4,7 +4,7 @@ from models import User, Job, Application
 from werkzeug.security import generate_password_hash, check_password_hash
 from helpers import check_required_fields, allowed_file, jwt_redis_blocklist
 from datetime import timedelta
-import psycopg2, re, os
+import re, os
 
 
 def register_routes(app, db):
