@@ -1,4 +1,4 @@
-from app import create_app, db
+from job_portal.app.app import create_app, db
 
 job_portal_app = create_app()
 

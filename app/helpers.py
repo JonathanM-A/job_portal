@@ -1,6 +1,6 @@
 import redis
 from flask import request
-from app import jwt
+from job_portal.app.app import jwt
 
 def check_required_fields(required_fields):
     data = request.get_json()
