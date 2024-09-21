@@ -1,8 +1,8 @@
 from flask import jsonify, request
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt
-from job_portal.app.models import User, Job, Application
+from models import User, Job, Application
 from werkzeug.security import generate_password_hash, check_password_hash
-from job_portal.app.helpers import check_required_fields, allowed_file, jwt_redis_blocklist
+from helpers import check_required_fields, allowed_file, jwt_redis_blocklist
 from datetime import timedelta
 import psycopg2, re, os
 

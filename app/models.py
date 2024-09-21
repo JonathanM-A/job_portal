@@ -1,5 +1,5 @@
 from datetime import datetime
-from job_portal.app.app import db
+from app import db
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
 
