@@ -14,9 +14,9 @@ jwt = JWTManager()
 def create_app():
     app = Flask(__name__)
 
-
     app.config["SQLALCHEMY_DATABASE_URI"] = (
-        f"postgresql://{os.getenv("user")}:{os.getenv("password")}@{os.getenv("host")}:{os.getenv("port")}/{os.getenv("database")}")
+        f"postgresql://{os.getenv('user')}:{os.getenv('password')}@{os.getenv('host')}:{os.getenv('port')}/{os.getenv('database')}"
+    )
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config["UPLOAD_FOLDER"] = "uploads"
     app.config["SECRET_KEY"] = os.getenv("secret_key")
