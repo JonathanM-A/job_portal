@@ -159,7 +159,7 @@ def register_routes(app, db):
             return jsonify({"error": "CV not uploaded"}), 400
 
         if not allowed_file(cv.filename):
-            return jsonify({"error": "File type not allowed. Only PDF accepted."}), 400
+            return jsonify({"error": "Unsupported file type."}), 415
 
         if not os.path.exists(app.config["UPLOAD_FOLDER"]):
             os.makedirs(app.config["UPLOAD_FOLDER"])
@@ -197,7 +197,7 @@ def register_routes(app, db):
         for application in user.applications:
             applications.append(str(application))
         
-        return jsonify({"Applications": applications})
+        return jsonify({"Applications": applications}), 200
     
     @app.route("/logout")
     @jwt_required()
