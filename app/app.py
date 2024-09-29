@@ -18,11 +18,14 @@ def create_app():
         f"postgresql://{os.getenv('user')}:{os.getenv('password')}@{os.getenv('host')}:{os.getenv('port')}/{os.getenv('database')}"
     )
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config["UPLOAD_FOLDER"] = "uploads"
+    # app.config["UPLOAD_FOLDER"] = "uploads"
     app.config["SECRET_KEY"] = os.getenv("secret_key")
     app.config["JWT_SECRET_KEY"] = os.getenv("secret_key")
     app.config["JWT_TOKEN_LOCATION"] = ["headers"]
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=24)
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.getenv(
+        "GOOGLE_APPLICATION_CREDENTIALS"
+    )
 
     db.init_app(app)
     jwt.init_app(app)

@@ -4,6 +4,7 @@ from models import User, Job, Application
 from werkzeug.security import generate_password_hash, check_password_hash
 from helpers import check_required_fields, allowed_file, jwt_redis_blocklist
 from datetime import timedelta
+from cloud_storage import upload_to_gcs, dowload_from_gcs
 import re, os
 
 
@@ -60,7 +61,7 @@ def register_routes(app, db):
             db.session.commit()
 
             return jsonify({"message": "User registered successfully"}), 201
-        
+
         except Exception as e:
             db.session.rollback()
             return jsonify({"error": str(e)}), 500
@@ -74,7 +75,7 @@ def register_routes(app, db):
 
         if password:
             user = User.query.filter_by(email=email).first()
-            
+
             if user and check_password_hash(user.password, password):
                 # track which users are logged in
                 expires = timedelta(hours=24)
@@ -101,8 +102,8 @@ def register_routes(app, db):
             return jsonify({"Job Listings": jobs_list}), 200
 
         if request.method == "POST":
-        
-            user_id = get_jwt_identity
+
+            user_id = get_jwt_identity()
             print(user_id)
 
             user = User.query.filter_by(id=user_id).first()
@@ -161,44 +162,44 @@ def register_routes(app, db):
         if not allowed_file(cv.filename):
             return jsonify({"error": "Unsupported file type."}), 415
 
-        if not os.path.exists(app.config["UPLOAD_FOLDER"]):
-            os.makedirs(app.config["UPLOAD_FOLDER"])
-
-        file_path = os.path.join(app.config["UPLOAD_FOLDER"], cv.filename)
-
-        new_application = Application(
-            applicant=applicant.id, listing=job.id, cv=cv.filename
-        )
         try:
+            destination_file_name = cv.filename
+            bucket_name = os.getenv('BUCKET_NAME')
+            print (bucket_name)
+            cv_url = upload_to_gcs(cv, destination_file_name, bucket_name)
+
+            new_application = Application(
+                applicant=applicant.id, listing=job.id, cv=cv_url)
+            
             db.session.add(new_application)
             job.num_applicants += 1
-            cv.save(file_path)
             db.session.commit()
             return jsonify({"message": "Application submitted"}), 200
 
         except Exception as e:
+            db.session.rollback()
             return jsonify({"error": str(e)}), 500
 
     # Job seeker applications
     @app.route("/applications")
     @jwt_required()
     def applications():
-        
+
         user_id = get_jwt_identity()
         user = User.query.get(user_id)
 
         if not user:
             return jsonify({"error": "User not found."})
-        
+
         if user.is_employer:
             return({"error": "Only job seekers can apply for jobs."}), 403
-        
+
         applications = []
         for application in user.applications:
             applications.append(str(application))
-        
+
         return jsonify({"Applications": applications}), 200
-    
+
     @app.route("/logout")
     @jwt_required()
     def logout():
